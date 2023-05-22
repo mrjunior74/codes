@@ -1,0 +1,71 @@
+from sklearn import datasets
+import warnings
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+#ignore warnings
+warnings.filterwarnings('ignore')
+
+df=pd.read_csv("Boston.csv")
+df.rename(columns = {'medv':'price'}, inplace = True)
+df
+
+df.info()
+df.isnull().sum()
+df.describe()
+df.shape
+
+#univariate EDA
+fig=plt.figure(figsize=(10,10))
+df.boxplot()
+
+sns.boxplot(df["rm"])
+plt.hist(df["rm"])
+df["rm"].value_counts()
+
+#bivariate EDA
+sns.scatterplot(x= df["lstat"],y = df["price"])
+
+sns.scatterplot(x= df["rm"],y = df["price"])
+
+#Multivariate EDA
+fig= plt.subplots(figsize=(10,10)) 
+sns.heatmap(df.corr(),annot=True,cmap="Blues")
+
+pip install keras_tuner
+import tensorflow.keras as tk
+
+model=tk.Sequential()
+
+#adding input layer
+model.add(tk.layers.Input(shape=(14,)))
+
+#adding first hidden layer
+model.add(tk.layers.Dense(units=6,activation="relu",kernel_initializer="he_uniform"))
+
+#adding second hidden layer
+model.add(tk.layers.Dense(units=6,activation="relu",kernel_initializer="he_uniform"))
+
+#adding output layer
+model.add(tk.layers.Dense(units=6,activation="relu",kernel_initializer="he_uniform"))
+
+#compiling the model
+model.compile(optimizer="adam",loss="mean_absolute_error")
+
+model.summary()
+
+df.head()
+x=df.iloc[:,:-1]
+display(x)
+y=df['price']
+display(y)
+
+from sklearn.model_selection import train_test_split
+xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.2,random_state=10)
+
+#training the model
+import time
+start=time.time()
+obj1=model.fit(x=xtrain,y=ytrain,epochs=50,batch_size=64,validation_data=(xtest,ytest))
